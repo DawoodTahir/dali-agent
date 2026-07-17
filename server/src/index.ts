@@ -44,19 +44,25 @@ app.use("/webhook", webhookRouter);
 app.use("/api/simulate", simulateRouter);
 app.use("/api/leads", leadsRouter);
 
-// Optionally serve the built frontend (single-deploy hosting).
-if (config.serveWeb) {
-  const webDist = path.resolve(__dirname, "../../web/dist");
-  if (fs.existsSync(webDist)) {
-    app.use(express.static(webDist));
-    app.get("*", (req: Request, res: Response, next) => {
-      if (req.path.startsWith("/api") || req.path.startsWith("/webhook")) return next();
-      res.sendFile(path.join(webDist, "index.html"));
-    });
-    console.log(`[web] serving static build from ${webDist}`);
-  } else {
-    console.warn(`[web] SERVE_WEB=1 but ${webDist} not found — run "npm run build" in web/`);
-  }
+// Serve the built frontend for single-service hosting.
+//
+// Auto-on: if web/dist is present next to the server, serve it — so a one-service
+// deploy (Render, Fly, a VPS) just works without needing SERVE_WEB set. Opt out
+// with SERVE_WEB=0 for an API-only host. This is deliberately forgiving: forgetting
+// the env var should not leave the UI dark ("Cannot GET /").
+const webDist = path.resolve(__dirname, "../../web/dist");
+const serveWeb = process.env.SERVE_WEB === "0" ? false : fs.existsSync(webDist);
+if (serveWeb) {
+  app.use(express.static(webDist));
+  app.get("*", (req: Request, res: Response, next) => {
+    if (req.path.startsWith("/api") || req.path.startsWith("/webhook")) return next();
+    res.sendFile(path.join(webDist, "index.html"));
+  });
+  console.log(`[web] serving static build from ${webDist}`);
+} else if (process.env.SERVE_WEB === "0") {
+  console.log(`[web] SERVE_WEB=0 — API only, not serving the UI`);
+} else {
+  console.warn(`[web] no build at ${webDist} — API only. Run "npm run build" in web/ to serve the UI.`);
 }
 
 app.listen(config.port, () => {

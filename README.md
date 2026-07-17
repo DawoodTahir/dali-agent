@@ -118,7 +118,7 @@ HTTPS URL for the webhook. The store is **in-memory**, so run a **single instanc
 
 **Frontend** → build (`npm run build` in `web/`) and deploy the `dist/` to Vercel / Netlify /
 Cloudflare Pages, and set `VITE_API_URL` to your backend URL. Or serve it from the backend:
-`SERVE_WEB=1` makes Express serve `web/dist` if present (single deploy).
+Express serves `web/dist` automatically when it's present (single deploy) — set `SERVE_WEB=0` to disable for an API-only host.
 
 ```bash
 cd web && npm run build           # outputs web/dist
