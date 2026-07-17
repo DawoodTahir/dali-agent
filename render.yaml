@@ -1,0 +1,59 @@
+# Render Blueprint — single service.
+#
+# Express serves the built React app (SERVE_WEB=1), so the UI and the engine share
+# one origin: no CORS to configure, one URL, one thing to go wrong on stage.
+#
+# The store is in-memory, so this MUST stay a single instance. Do not add
+# `numInstances` or autoscaling without swapping store.ts for a shared DB first —
+# leads and the SSE stream would diverge between replicas.
+
+services:
+  - type: web
+    name: dali-qualifier
+    runtime: node
+    # free = sleeps after ~15 min idle, ~50s cold start, and every restart wipes
+    # the in-memory leads. Fine for kicking tyres; use `starter` for a live pitch.
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+
+    # --include=dev is required: Render sets NODE_ENV=production, which makes
+    # `npm ci` skip devDependencies — and typescript/vite live there, so the
+    # build would fail without it.
+    buildCommand: >-
+      cd web && npm ci --include=dev && npm run build &&
+      cd ../server && npm ci --include=dev && npm run build
+    startCommand: cd server && npm start
+
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+
+      # Serve web/dist from Express — this is what makes it a single service.
+      - key: SERVE_WEB
+        value: "1"
+
+      # sync:false = Render prompts for this in the dashboard and never stores it
+      # in the blueprint. The key must never be committed.
+      # Leave it unset and the app still runs — on the deterministic mock.
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+      # Haiku 4.5: two calls per lead turn, so latency is the constraint.
+      - key: LLM_MODEL
+        value: claude-haiku-4-5-20251001
+
+      # ---- Qualification bar (change the behaviour here, not in code) ----
+      - key: QUALIFY_THRESHOLD
+        value: "75"
+      - key: DISQUALIFY_THRESHOLD
+        value: "40"
+
+      # ---- Agency identity (shapes the agent's scope and phrasing) ----
+      - key: AGENCY_NAME
+        value: DALI Agency
+      - key: AGENCY_DESCRIPTION
+        value: a creative and brand agency that does brand identity, campaigns and design for D2C and growth-stage companies
+
+      # WhatsApp stays off: the Simulator needs none of it, and wiring it up
+      # needs a Meta app + a permanent token. See README.
