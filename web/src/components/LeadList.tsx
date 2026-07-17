@@ -11,7 +11,7 @@ export function LeadList({
   onSelect: (id: string) => void;
 }) {
   if (leads.length === 0) {
-    return <div className="ll-empty mono">No leads yet. Qualify one in the Simulator tab.</div>;
+    return <div className="ll-empty mono">No leads yet. Qualify one in the Live chat tab.</div>;
   }
   return (
     <ul className="lead-list">

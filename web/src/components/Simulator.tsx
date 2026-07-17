@@ -4,6 +4,8 @@ import { Message, Slots, LeadStatus, SlotKey, Trace } from "../types";
 import { ScorePanel } from "./ScorePanel";
 import { EngineTrace } from "./EngineTrace";
 
+type Layout = "console" | "pipeline";
+
 const emptySlots: Slots = {
   need: { value: null, filled: false },
   timeline: { value: null, filled: false },
@@ -71,6 +73,7 @@ export function Simulator() {
   const [justFilled, setJustFilled] = useState<SlotKey[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [layout, setLayout] = useState<Layout>("console");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -123,86 +126,114 @@ export function Simulator() {
 
   const done = status !== "active";
 
-  return (
-    <div className="sim">
-      <div className="phone">
-        <div className="phone-head">
-          <div className="ph-avatar">D</div>
-          <div>
-            <div className="ph-name">DALI Agency</div>
-            <div className="ph-sub mono">business account · you are the lead</div>
+  const phone = (
+    <div className="phone">
+      <div className="phone-head">
+        <div className="ph-avatar">D</div>
+        <div>
+          <div className="ph-name">DALI Agency</div>
+          <div className="ph-sub mono">business account · you are the lead</div>
+        </div>
+        <button className="reset" onClick={reset} title="Start a new conversation">
+          new lead
+        </button>
+      </div>
+
+      <div className="thread" ref={scrollRef}>
+        {messages.length === 0 && (
+          <div className="empty">
+            <p className="empty-lede">You're the inbound lead. Pick someone to play —</p>
+            <p className="empty-sub">or just start typing at the bottom.</p>
+            <div className="personas">
+              {PERSONAS.map((p) => (
+                <button
+                  key={p.name}
+                  className="persona"
+                  onClick={() => send(p.opener)}
+                  disabled={busy}
+                >
+                  <span className={`persona-icon ${p.kind}`}>{p.icon}</span>
+                  <span className="persona-body">
+                    <span className="persona-name">{p.name}</span>
+                    <span className="persona-line">“{p.opener}”</span>
+                    <span className="persona-out">{p.outcome}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-          <button className="reset" onClick={reset} title="Start a new conversation">
-            new lead
-          </button>
-        </div>
+        )}
 
-        <div className="thread" ref={scrollRef}>
-          {messages.length === 0 && (
-            <div className="empty">
-              <p className="empty-lede">You're the inbound lead. Pick someone to play —</p>
-              <p className="empty-sub">or just start typing at the bottom.</p>
-              <div className="personas">
-                {PERSONAS.map((p) => (
-                  <button
-                    key={p.name}
-                    className="persona"
-                    onClick={() => send(p.opener)}
-                    disabled={busy}
-                  >
-                    <span className={`persona-icon ${p.kind}`}>{p.icon}</span>
-                    <span className="persona-body">
-                      <span className="persona-name">{p.name}</span>
-                      <span className="persona-line">“{p.opener}”</span>
-                      <span className="persona-out">{p.outcome}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
+        {messages.map((m, i) =>
+          m.role === "system" ? (
+            <div key={i} className="sys">{m.text}</div>
+          ) : (
+            <div key={i} className={`bubble ${m.role === "lead" ? "out" : "in"}`}>
+              {m.text}
+              <span className="meta">
+                {m.role === "agent" && m.source && (
+                  <span className={`src ${m.source}`}>{m.source}</span>
+                )}
+                {new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </span>
             </div>
-          )}
+          )
+        )}
 
-          {messages.map((m, i) =>
-            m.role === "system" ? (
-              <div key={i} className="sys">{m.text}</div>
-            ) : (
-              <div key={i} className={`bubble ${m.role === "lead" ? "out" : "in"}`}>
-                {m.text}
-                <span className="meta">
-                  {m.role === "agent" && m.source && (
-                    <span className={`src ${m.source}`}>{m.source}</span>
-                  )}
-                  {new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </span>
-              </div>
-            )
-          )}
+        {busy && (
+          <div className="typing">
+            <span></span><span></span><span></span>
+          </div>
+        )}
+      </div>
 
-          {busy && (
-            <div className="typing">
-              <span></span><span></span><span></span>
-            </div>
-          )}
+      <div className="composer">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && send(input)}
+          placeholder={done ? "Conversation complete — hit “new lead” to run it again" : "Type as the lead…"}
+          disabled={busy || done}
+        />
+        <button onClick={() => send(input)} disabled={busy || done || !input.trim()}>
+          Send
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <div className="sim-head">
+        <div>
+          <h2>Play an inbound lead</h2>
+          <p>
+            Pick a persona or type. Watch the engine decide —{" "}
+            <strong>the code scores and hands off; the model only extracts and phrases.</strong>
+          </p>
         </div>
-
-        <div className="composer">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && send(input)}
-            placeholder={done ? "Conversation complete — hit “new lead” to run it again" : "Type as the lead…"}
-            disabled={busy || done}
-          />
-          <button onClick={() => send(input)} disabled={busy || done || !input.trim()}>
-            Send
-          </button>
+        <div className="seg-wrap">
+          <span className="seg-label">Layout</span>
+          <div className="seg">
+            <button className={layout === "console" ? "on" : ""} onClick={() => setLayout("console")}>
+              Console
+            </button>
+            <button className={layout === "pipeline" ? "on" : ""} onClick={() => setLayout("pipeline")}>
+              Pipeline
+            </button>
+          </div>
         </div>
       </div>
 
-      <aside className="sim-side">
-        <ScorePanel score={score} slots={slots} status={status} justFilled={justFilled} />
-        <EngineTrace trace={trace} busy={busy} />
-      </aside>
-    </div>
+      <div className={`sim sim-${layout}`}>
+        <div className="sim-phone-cell">{phone}</div>
+        <div className="sim-score-cell">
+          <ScorePanel score={score} slots={slots} status={status} justFilled={justFilled} />
+        </div>
+        <div className="sim-trace-cell">
+          <EngineTrace trace={trace} busy={busy} horizontal={layout === "pipeline"} />
+        </div>
+      </div>
+    </>
   );
 }

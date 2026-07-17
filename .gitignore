@@ -4,3 +4,7 @@ dist/
 *.log
 .DS_Store
 node_modules/.tmp/
+
+# UI revamp handoff artifacts (applied into web/ — kept locally, not part of the app)
+dali-ui-revamp/
+*.zip
