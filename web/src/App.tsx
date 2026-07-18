@@ -33,9 +33,7 @@ export function App() {
         <div className="brand">
           <span className="brand-mark" />
           <div>
-            <div className="brand-name">
-              DALI Qualifier <span className="beta">Beta</span>
-            </div>
+            <div className="brand-name">DALI Qualifier</div>
             <div className="brand-sub">WhatsApp lead qualification agent</div>
           </div>
         </div>

@@ -121,12 +121,7 @@ a:hover { color:var(--blue-700); text-decoration:underline; }
   content:""; position:absolute; inset:9px; border-radius:2px;
   background:var(--ink-200);
 }
-.brand-name { font-family:var(--serif); font-weight:600; font-size:17px; letter-spacing:-.01em; line-height:1.15; color:var(--ink); display:flex; align-items:center; gap:7px; }
-.beta {
-  font-family:var(--mono); font-size:.56rem; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
-  color:var(--blue-700); background:var(--blue-50); border:1px solid var(--blue-100);
-  padding:1px 6px; border-radius:4px; transform:translateY(-1px);
-}
+.brand-name { font-family:var(--serif); font-weight:600; font-size:17px; letter-spacing:-.01em; line-height:1.15; color:var(--ink); }
 .brand-sub { font-size:.72rem; color:var(--ink-3); }
 
 .tabs { display:flex; gap:2px; padding:3px; background:var(--sunk); border-radius:999px; }

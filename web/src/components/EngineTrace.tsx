@@ -61,7 +61,9 @@ function buildStages(trace: Trace): StageData[] {
 }
 
 function StageBadge({ badge }: { badge: Badge }) {
-  return <span className={`by ${badge === "code" ? "code" : "llm"}`}>{badge === "code" ? "code" : "claude"}</span>;
+  // Only the deterministic-code stages are tagged; extraction/phrasing carry none.
+  if (badge !== "code") return null;
+  return <span className="by code">code</span>;
 }
 
 function StageValue({ s }: { s: StageData }) {
@@ -86,8 +88,7 @@ export function EngineTrace({ trace, busy }: { trace: Trace | null; busy: boolea
       </div>
 
       <div className="trace-legend mono">
-        <span><span className="by code">code</span> decides</span>
-        <span><span className="by llm">claude</span> extracts &amp; phrases</span>
+        <span><span className="by code">code</span> decides the handoff, deterministically</span>
       </div>
 
       {!trace ? (
