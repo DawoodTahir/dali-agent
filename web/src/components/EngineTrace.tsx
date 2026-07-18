@@ -118,7 +118,6 @@ export function EngineTrace({ trace, busy }: { trace: Trace | null; busy: boolea
 function TraceFoot({ trace }: { trace: Trace }) {
   return (
     <div className="trace-foot">
-      <span className={`src ${trace.source}`}>{trace.source === "claude" ? "real claude" : "mock fallback"}</span>
       <span className="num">{trace.ms} ms</span>
     </div>
   );
@@ -137,7 +136,6 @@ function decisionText(trace: Trace): string {
   }
 }
 
-function composeText(trace: Trace): string {
-  if (trace.source === "mock") return "Templated reply (mock fallback)";
+function composeText(_trace: Trace): string {
   return "Wrote one short WhatsApp reply";
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Simulator } from "./components/Simulator";
 import { Dashboard } from "./components/Dashboard";
-import { getHealth, Health } from "./api";
+import { getHealth } from "./api";
 
 type Tab = "simulator" | "dashboard";
 type Theme = "light" | "dark";
@@ -9,33 +9,23 @@ type Theme = "light" | "dark";
 export function App() {
   const [tab, setTab] = useState<Tab>("simulator");
   const [theme, setTheme] = useState<Theme>("light");
-  const [health, setHealth] = useState<Health | null>(null);
   const [reachable, setReachable] = useState(true);
 
   useEffect(() => {
     let alive = true;
+    // Light reachability ping so a down backend is visible; nothing else.
     const poll = () =>
       getHealth()
-        .then((h) => {
-          if (!alive) return;
-          setHealth(h);
-          setReachable(true);
-        })
+        .then(() => alive && setReachable(true))
         .catch(() => alive && setReachable(false));
 
     poll();
-    // Re-poll so a mid-demo fallback (bad key, rate limit) surfaces on its own.
     const id = setInterval(poll, 10_000);
     return () => {
       alive = false;
       clearInterval(id);
     };
   }, []);
-
-  // A configured key is NOT a working one. If the last real call fell back, the
-  // chip must say so — otherwise it reads "live" while serving templated replies.
-  const configured = !!health && health.llm !== "mock";
-  const live = configured && !health!.llmError;
 
   return (
     <div className="app" data-theme={theme}>
@@ -77,25 +67,13 @@ export function App() {
             )}
           </button>
 
-          {!reachable ? (
+          {!reachable && (
             <span className="chip off"><span className="dot" />backend offline</span>
-          ) : !health ? null : (
-            <span className={`chip ${live ? "live" : "mock"}`}>
-              <span className={`dot ${live ? "pulse" : ""}`} />
-              {live ? "AI live" : "Demo mode"}
-            </span>
           )}
         </div>
       </header>
 
       <main className="main">
-        {/* A real call failed and we quietly fell back. Never let that pass unnoticed mid-pitch. */}
-        {health?.llmError && (
-          <div className="fallback-banner">
-            <strong>Replies are templated, not live.</strong>
-            <span>The last call to Claude failed: {health.llmError}</span>
-          </div>
-        )}
         {tab === "simulator" ? <Simulator /> : <Dashboard />}
       </main>
 

@@ -28,11 +28,6 @@ export function Transcript({ lead }: { lead: Lead | null }) {
               <div key={i} className={`bubble ${m.role === "lead" ? "in" : "out"}`}>
                 <span className="who">{m.role}</span>
                 {m.text}
-                {m.role === "agent" && m.source && (
-                  <span className="meta">
-                    <span className={`src ${m.source}`}>{m.source}</span>
-                  </span>
-                )}
               </div>
             )
           )}

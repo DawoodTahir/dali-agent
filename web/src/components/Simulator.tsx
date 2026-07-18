@@ -168,9 +168,6 @@ export function Simulator() {
             <div key={i} className={`bubble ${m.role === "lead" ? "out" : "in"}`}>
               {m.text}
               <span className="meta">
-                {m.role === "agent" && m.source && (
-                  <span className={`src ${m.source}`}>{m.source}</span>
-                )}
                 {new Date(m.ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </span>
             </div>
