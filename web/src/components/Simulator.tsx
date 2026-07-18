@@ -218,12 +218,10 @@ export function Simulator() {
 
       <div className="sim">
         <div className="sim-phone-cell">{phone}</div>
-        <div className="sim-score-cell">
+        <aside className="sim-side">
           <ScorePanel score={score} slots={slots} status={status} justFilled={justFilled} />
-        </div>
-        <div className="sim-trace-cell">
           <EngineTrace trace={trace} busy={busy} />
-        </div>
+        </aside>
       </div>
     </>
   );

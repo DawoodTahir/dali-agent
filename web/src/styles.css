@@ -196,10 +196,12 @@ a:hover { color:var(--blue-700); text-decoration:underline; }
 .theme-toggle { display:grid; place-items:center; width:34px; height:34px; border:1px solid var(--rule); background:var(--surface); color:var(--ink-3); border-radius:6px; transition:background .16s var(--ease), color .16s var(--ease); }
 .theme-toggle:hover { background:var(--surface-2); color:var(--ink); }
 
-.sim { display:grid; gap:20px; align-items:start; grid-template-columns:minmax(0,1fr) 372px; grid-template-rows:auto 1fr; grid-template-areas:"phone score" "phone trace"; }
-.sim-phone-cell { grid-area:phone; min-width:0; }
-.sim-score-cell { grid-area:score; min-width:0; position:sticky; top:78px; }
-.sim-trace-cell { grid-area:trace; min-width:0; }
+.sim { display:grid; gap:20px; align-items:start; grid-template-columns:minmax(0,1fr) 372px; }
+.sim-phone-cell { min-width:0; }
+/* Right column: score above trace, each at its natural height. Stacking with a
+   flex column (not a fixed-height grid) means a tall score card can never
+   overflow into the trace below it. */
+.sim-side { display:flex; flex-direction:column; gap:16px; min-width:0; }
 
 .phone {
   background:var(--surface); border:1px solid var(--rule); border-radius:12px;
@@ -453,8 +455,7 @@ a:hover { color:var(--blue-700); text-decoration:underline; }
 
 /* ==================== responsive ==================== */
 @media (max-width:980px) {
-  .sim { grid-template-columns:1fr; grid-template-rows:none; grid-template-areas:"phone" "score" "trace"; }
-  .sim-score-cell { position:static; }
+  .sim { grid-template-columns:1fr; }
   .sim-facts { margin-left:0; }
   .dash-grid { grid-template-columns:1fr; }
   .tr-grid { grid-template-columns:1fr; }
