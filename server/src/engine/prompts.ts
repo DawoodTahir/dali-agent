@@ -68,6 +68,7 @@ export function composeSystemPrompt(): string {
     ``,
     `Rules:`,
     `- Write ONE short WhatsApp message. Warm, human, concise. No markdown, no bullet points.`,
+    `- Do NOT use em-dashes or en-dashes (— or –). Use commas, periods, or parentheses instead. Plain hyphens in ranges like 25-30k are fine.`,
     `- Ask at most ONE question per message.`,
     `- Stay strictly on the topic of their project and working with ${config.agencyName}.`,
     `- Never invent facts, prices, or promises. Don't give a quote.`,
@@ -111,4 +112,4 @@ export function composeUserPrompt(lead: Lead, action: ComposeAction): string {
   return ctx.join("\n");
 }
 
-export const DISCLOSURE = `You're chatting with ${config.agencyName}'s assistant — I'll grab a few details and pass you to the team. `;
+export const DISCLOSURE = `You're chatting with ${config.agencyName}'s assistant. I'll grab a few details and pass you to the team. `;

@@ -4,8 +4,6 @@ import { Message, Slots, LeadStatus, SlotKey, Trace } from "../types";
 import { ScorePanel } from "./ScorePanel";
 import { EngineTrace } from "./EngineTrace";
 
-type Layout = "console" | "pipeline";
-
 const emptySlots: Slots = {
   need: { value: null, filled: false },
   timeline: { value: null, filled: false },
@@ -34,8 +32,8 @@ const PERSONAS: Persona[] = [
   {
     name: "Founder, funded, ready",
     opener:
-      "Hi — saw your work for Ollie. We're launching a skincare line and need a full brand identity. Want it live by October, budget's 25–30k. I'm the founder so it's my call.",
-    outcome: "clears the bar → hands off",
+      "Hi, saw your work for Ollie. We're launching a skincare line and need a full brand identity. Want it live by October, budget's 25-30k. I'm the founder so it's my call.",
+    outcome: "clears the bar, hands off",
     icon: "◆",
     kind: "qualified",
   },
@@ -50,7 +48,7 @@ const PERSONAS: Persona[] = [
     name: "Curious, no budget",
     opener:
       "Just looking around really. Might rebrand at some point, no timeline. Not sure we'd have money for it and I'd have to ask my boss anyway.",
-    outcome: "scores low → closes politely",
+    outcome: "scores low, closes politely",
     icon: "○",
     kind: "closed",
   },
@@ -73,7 +71,6 @@ export function Simulator() {
   const [justFilled, setJustFilled] = useState<SlotKey[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
-  const [layout, setLayout] = useState<Layout>("console");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -106,7 +103,7 @@ export function Simulator() {
     } catch {
       setMessages((m) => [
         ...m,
-        { role: "system", text: "⚠ backend unreachable — is the server running on :8080?", ts: Date.now() },
+        { role: "system", text: "⚠ backend unreachable. Is the server running on :8080?", ts: Date.now() },
       ]);
     } finally {
       setBusy(false);
@@ -142,7 +139,7 @@ export function Simulator() {
       <div className="thread" ref={scrollRef}>
         {messages.length === 0 && (
           <div className="empty">
-            <p className="empty-lede">You're the inbound lead. Pick someone to play —</p>
+            <p className="empty-lede">You're the inbound lead. Pick someone to play,</p>
             <p className="empty-sub">or just start typing at the bottom.</p>
             <div className="personas">
               {PERSONAS.map((p) => (
@@ -192,7 +189,7 @@ export function Simulator() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && send(input)}
-          placeholder={done ? "Conversation complete — hit “new lead” to run it again" : "Type as the lead…"}
+          placeholder={done ? "Conversation complete. Hit “new lead” to run it again" : "Type as the lead…"}
           disabled={busy || done}
         />
         <button onClick={() => send(input)} disabled={busy || done || !input.trim()}>
@@ -208,30 +205,24 @@ export function Simulator() {
         <div>
           <h2>Play an inbound lead</h2>
           <p>
-            Pick a persona or type. Watch the engine decide —{" "}
-            <strong>the code scores and hands off; the model only extracts and phrases.</strong>
+            Pick a persona or type. Watch the engine decide.{" "}
+            <strong>The code scores and hands off; the model only extracts and phrases.</strong>
           </p>
         </div>
-        <div className="seg-wrap">
-          <span className="seg-label">Layout</span>
-          <div className="seg">
-            <button className={layout === "console" ? "on" : ""} onClick={() => setLayout("console")}>
-              Console
-            </button>
-            <button className={layout === "pipeline" ? "on" : ""} onClick={() => setLayout("pipeline")}>
-              Pipeline
-            </button>
-          </div>
-        </div>
+        <ul className="sim-facts">
+          <li><span className="fact-v">4</span><span className="fact-k">signals scored</span></li>
+          <li><span className="fact-v">75</span><span className="fact-k">handoff bar</span></li>
+          <li><span className="fact-v">2</span><span className="fact-k">AI calls / turn</span></li>
+        </ul>
       </div>
 
-      <div className={`sim sim-${layout}`}>
+      <div className="sim">
         <div className="sim-phone-cell">{phone}</div>
         <div className="sim-score-cell">
           <ScorePanel score={score} slots={slots} status={status} justFilled={justFilled} />
         </div>
         <div className="sim-trace-cell">
-          <EngineTrace trace={trace} busy={busy} horizontal={layout === "pipeline"} />
+          <EngineTrace trace={trace} busy={busy} />
         </div>
       </div>
     </>

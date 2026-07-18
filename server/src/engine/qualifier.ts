@@ -27,8 +27,8 @@ export async function handleInbound(lead: Lead, text: string): Promise<TurnResul
   if (lead.status === "qualified" || lead.status === "disqualified" || lead.status === "closed") {
     const reply =
       lead.status === "qualified"
-        ? "You're all set — the team has your details and will be in touch. "
-        : "Thanks — the team has what they need for now. ";
+        ? "You're all set. The team has your details and will be in touch. "
+        : "Thanks, the team has what they need for now. ";
     lead.messages.push({ role: "agent", text: reply, ts: Date.now(), source: "mock" });
     saveLead(lead);
     return {

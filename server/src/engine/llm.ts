@@ -86,7 +86,7 @@ function humanError(err: unknown): string {
   if (err instanceof Anthropic.AuthenticationError) return "the API key is invalid (401)";
   if (err instanceof Anthropic.PermissionDeniedError) return "this key can't access that model (403)";
   if (err instanceof Anthropic.NotFoundError) return `no such model: "${config.llmModel}" (404)`;
-  if (err instanceof Anthropic.RateLimitError) return "rate limited — too many requests (429)";
+  if (err instanceof Anthropic.RateLimitError) return "rate limited, too many requests (429)";
   if (err instanceof Anthropic.APIConnectionError) return "couldn't reach api.anthropic.com";
 
   if (err instanceof Anthropic.APIError) {
@@ -96,7 +96,7 @@ function humanError(err: unknown): string {
     if (msg) {
       // The billing message is the one people actually hit — make it plain.
       if (/credit balance is too low/i.test(msg)) {
-        return "the Anthropic account is out of credit — top up at console.anthropic.com → Plans & Billing";
+        return "the Anthropic account is out of credit. Top up at console.anthropic.com under Plans & Billing";
       }
       return msg;
     }
@@ -211,7 +211,7 @@ function mockAnalyze(lead: Lead, latest: string): Analysis {
 }
 
 const MOCK_QUESTIONS: Record<SlotKey, string> = {
-  need: "Happy to help. What are you looking to build — and what's the project?",
+  need: "Happy to help. What are you looking to build, and what's the project?",
   timeline: "Got it. When do you need this live, or is there a deadline you're working to?",
   budget: "Makes sense. Do you have a budget range in mind for the work?",
   authority: "Great. And are you the decision-maker on this, or would others be involved in signing off?",
@@ -222,10 +222,10 @@ function mockCompose(lead: Lead, action: ComposeAction): string {
     case "ask":
       return MOCK_QUESTIONS[action.slot];
     case "handoff":
-      return "That's a strong fit — I'm passing you to the team now. They've got everything you've told me, so you won't need to repeat yourself. They'll be with you shortly.";
+      return "That's a strong fit, so I'm passing you to the team now. They've got everything you've told me, so you won't need to repeat yourself. They'll be with you shortly.";
     case "close":
-      return "Thanks so much for the details. The team will take a look and follow up if it's the right fit — in the meantime feel free to browse our recent work on the site.";
+      return "Thanks so much for the details. The team will take a look and follow up if it's the right fit. In the meantime feel free to browse our recent work on the site.";
     case "redirect":
-      return `That's a little outside what I can help with here — I'm just the ${config.agencyName} assistant for project enquiries. Tell me a bit about what you're looking to build?`;
+      return `That's a little outside what I can help with here. I'm just the ${config.agencyName} assistant for project enquiries. Tell me a bit about what you're looking to build?`;
   }
 }

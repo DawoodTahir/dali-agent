@@ -43,8 +43,10 @@ export function App() {
         <div className="brand">
           <span className="brand-mark" />
           <div>
-            <div className="brand-name">DALI Qualifier</div>
-            <div className="brand-sub">WhatsApp lead qualification</div>
+            <div className="brand-name">
+              DALI Qualifier <span className="beta">Beta</span>
+            </div>
+            <div className="brand-sub">WhatsApp lead qualification agent</div>
           </div>
         </div>
 
@@ -78,19 +80,10 @@ export function App() {
           {!reachable ? (
             <span className="chip off"><span className="dot" />backend offline</span>
           ) : !health ? null : (
-            <>
-              <span className={`chip ${live ? "live" : "mock"}`}>
-                <span className={`dot ${live ? "pulse" : ""}`} />
-                {live
-                  ? health.llm
-                  : configured
-                    ? "falling back to mock"
-                    : "mock LLM — no API key"}
-              </span>
-              <span className="chip plain">
-                {health.whatsapp === "connected" ? "WhatsApp live" : "simulator only"}
-              </span>
-            </>
+            <span className={`chip ${live ? "live" : "mock"}`}>
+              <span className={`dot ${live ? "pulse" : ""}`} />
+              {live ? "AI live" : "Demo mode"}
+            </span>
           )}
         </div>
       </header>

@@ -59,8 +59,8 @@ export function ScorePanel({
       </ul>
 
       <p className="sp-note mono">
-        Weights sum to 100 and live in config. The score is arithmetic — no model
-        involved in the handoff call.
+        Weights sum to 100 and live in config. The score is arithmetic, with no
+        model involved in the handoff call.
       </p>
     </div>
   );

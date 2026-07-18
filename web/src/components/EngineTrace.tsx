@@ -5,9 +5,6 @@ import { SLOT_LABEL, SlotKey, Trace } from "../types";
  *
  * The `code` / `claude` badges are the point: SCORE and DECIDE are plain
  * arithmetic in scoring.ts, and the panel says so on every single turn.
- *
- * `horizontal` renders the same data as a full-width pipeline strip — used by
- * the Simulator's "Pipeline" layout to make the trace the hero of the view.
  */
 
 type Badge = "code" | "claude";
@@ -29,7 +26,7 @@ function buildStages(trace: Trace): StageData[] {
       on: true,
       badge: "claude",
       kind: "text",
-      text: trace.inScope ? "In scope — a project enquiry" : "Off topic — redirecting, not answering",
+      text: trace.inScope ? "In scope, a project enquiry" : "Off topic, redirecting instead of answering",
       off: !trace.inScope,
     },
     {
@@ -78,19 +75,11 @@ function StageValue({ s }: { s: StageData }) {
   return <span className={s.off ? "off" : undefined}>{s.text}</span>;
 }
 
-export function EngineTrace({
-  trace,
-  busy,
-  horizontal = false,
-}: {
-  trace: Trace | null;
-  busy: boolean;
-  horizontal?: boolean;
-}) {
+export function EngineTrace({ trace, busy }: { trace: Trace | null; busy: boolean }) {
   const stages = trace ? buildStages(trace) : [];
 
   return (
-    <div className={`card trace ${horizontal ? "hero" : ""}`}>
+    <div className="card trace">
       <div className="trace-head">
         <span className="k">Engine trace · last turn</span>
         {busy && <span className="chip plain"><span className="dot pulse" />running</span>}
@@ -103,31 +92,9 @@ export function EngineTrace({
 
       {!trace ? (
         <p className="trace-idle">
-          Send a message and the pipeline for that turn appears here — what was
+          Send a message and the pipeline for that turn appears here: what was
           extracted, what it scored, and who decided.
         </p>
-      ) : horizontal ? (
-        <>
-          <div className="pipeline-strip">
-            {stages.map((s, i) => (
-              <div className="pstage-wrap" key={s.k}>
-                <div className={`stage-card ${s.on ? "on" : ""}`}>
-                  <div className="stage-card-head">
-                    <span className="stage-k">{s.k}</span>
-                    <StageBadge badge={s.badge} />
-                  </div>
-                  <span className="stage-v"><StageValue s={s} /></span>
-                </div>
-                {i < stages.length - 1 && (
-                  <svg className="stage-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" /><path d="m13 6 6 6-6 6" />
-                  </svg>
-                )}
-              </div>
-            ))}
-          </div>
-          <TraceFoot trace={trace} />
-        </>
       ) : (
         <>
           <ul className="stages">
